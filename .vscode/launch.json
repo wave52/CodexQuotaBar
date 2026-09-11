@@ -1,0 +1,24 @@
+{
+  "configurations": [
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:CodexQuotaBar}",
+      "name": "Debug CodexQuotaBar",
+      "target": "CodexQuotaBar",
+      "configuration": "debug",
+      "preLaunchTask": "swift: Build Debug CodexQuotaBar"
+    },
+    {
+      "type": "swift",
+      "request": "launch",
+      "args": [],
+      "cwd": "${workspaceFolder:CodexQuotaBar}",
+      "name": "Release CodexQuotaBar",
+      "target": "CodexQuotaBar",
+      "configuration": "release",
+      "preLaunchTask": "swift: Build Release CodexQuotaBar"
+    }
+  ]
+}
