@@ -10,7 +10,9 @@ struct CodexQuotaBarApp: App {
                 .environmentObject(store)
         } label: {
             HStack(spacing: 4) {
-                Image(systemName: "terminal.fill")
+                Image(nsImage: BrandIcon.menuBarImage)
+                    .renderingMode(.original)
+                    .accessibilityLabel("Codex Quota Bar")
                 if let remaining = store.menuBarPercent {
                     Text("\(remaining)%")
                 }

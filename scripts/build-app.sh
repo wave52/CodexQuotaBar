@@ -8,9 +8,12 @@ binary_dir="$app_dir/Contents/MacOS"
 cd "$project_dir"
 swift build -c release
 
-mkdir -p "$binary_dir"
+bash scripts/build-icon.sh
+mkdir -p "$binary_dir" "$app_dir/Contents/Resources"
+cp "$project_dir/Resources/AppIcon.icns" "$app_dir/Contents/Resources/AppIcon.icns"
 cp ".build/release/CodexQuotaBar" "$binary_dir/CodexQuotaBar"
 cp "$project_dir/Resources/Info.plist" "$app_dir/Contents/Info.plist"
 
 codesign --force --deep --sign - "$app_dir"
+codesign --verify --strict "$app_dir"
 echo "$app_dir"

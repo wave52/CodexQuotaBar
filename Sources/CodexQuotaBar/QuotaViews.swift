@@ -51,9 +51,11 @@ struct QuotaPopoverView: View {
 
     private var header: some View {
         HStack(spacing: 10) {
-            Image(systemName: "terminal.fill")
-                .font(.title3)
-                .foregroundStyle(.tint)
+            Image(nsImage: BrandIcon.image)
+                .resizable()
+                .frame(width: 36, height: 36)
+                .clipShape(RoundedRectangle(cornerRadius: 8))
+                .accessibilityLabel("Codex Quota Bar")
             VStack(alignment: .leading, spacing: 2) {
                 Text("Codex 额度")
                     .font(.headline)
