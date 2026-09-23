@@ -1,11 +1,14 @@
 import SwiftUI
 
 struct SegmentedProgressView: View {
-    let percent: Int
+    let percent: Double
     var segmentCount = 7
+    var barHeight: CGFloat = 10
+    var tint: Color?
+    var progressLabel = "周额度已使用"
 
     private var normalizedProgress: Double {
-        Double(min(max(percent, 0), 100)) / 100
+        min(max(percent, 0), 100) / 100
     }
 
     var body: some View {
@@ -16,16 +19,16 @@ struct SegmentedProgressView: View {
                     ZStack(alignment: .leading) {
                         Capsule().fill(.quaternary)
                         Capsule()
-                            .fill(progressColor)
+                            .fill(tint ?? progressColor)
                             .frame(width: geometry.size.width * fill)
                     }
                 }
             }
         }
-        .frame(height: 10)
+        .frame(height: barHeight)
         .accessibilityElement(children: .ignore)
-        .accessibilityLabel("周额度已使用 \(percent)%")
-        .accessibilityValue("分为 \(segmentCount) 段")
+        .accessibilityLabel(progressLabel)
+        .accessibilityValue("\((normalizedProgress * 100).formatted(.number.precision(.fractionLength(2))))%")
     }
 
     private var progressColor: Color {

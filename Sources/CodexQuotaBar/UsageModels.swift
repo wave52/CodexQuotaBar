@@ -8,17 +8,16 @@ struct RateLimitWindow: Codable, Equatable, Sendable {
     var clampedUsedPercent: Int { min(max(usedPercent, 0), 100) }
     var isWeekly: Bool { (windowDurationMins ?? 0) >= 8_000 }
 
-    func paceDelta(at date: Date = .now) -> Double? {
-        guard isWeekly,
-              let durationMinutes = windowDurationMins,
+    func elapsedTimePercent(at date: Date = .now) -> Double? {
+        guard let durationMinutes = windowDurationMins,
               let resetTimestamp = resetsAt,
               durationMinutes > 0 else { return nil }
 
         let reset = Date(timeIntervalSince1970: TimeInterval(resetTimestamp))
-        let start = reset.addingTimeInterval(-TimeInterval(durationMinutes * 60))
-        let elapsed = date.timeIntervalSince(start) / TimeInterval(durationMinutes * 60)
-        let elapsedPercent = min(max(elapsed, 0), 1) * 100
-        return Double(clampedUsedPercent) - elapsedPercent
+        let duration = TimeInterval(durationMinutes) * 60
+        let start = reset.addingTimeInterval(-duration)
+        let elapsed = date.timeIntervalSince(start) / duration
+        return min(max(elapsed, 0), 1) * 100
     }
 }
 

@@ -165,7 +165,15 @@ struct WindowView: View {
     let window: RateLimitWindow
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
+        TimelineView(.periodic(from: .now, by: 1)) { context in
+            content(at: context.date)
+        }
+    }
+
+    private func content(at date: Date) -> some View {
+        let elapsedPercent = window.elapsedTimePercent(at: date)
+
+        return VStack(alignment: .leading, spacing: 7) {
             HStack(alignment: .firstTextBaseline) {
                 Text(window.isWeekly ? "周额度" : shortWindowTitle)
                     .font(.subheadline.weight(.medium))
@@ -174,18 +182,38 @@ struct WindowView: View {
                     .font(.system(.subheadline, design: .rounded, weight: .semibold))
             }
 
-            if window.isWeekly {
-                SegmentedProgressView(percent: window.clampedUsedPercent)
-                HStack {
-                    Text(paceDescription)
-                    Spacer()
+            VStack(spacing: 4) {
+                if window.isWeekly {
+                    SegmentedProgressView(percent: Double(window.clampedUsedPercent))
+                } else {
+                    ContinuousProgressView(percent: window.clampedUsedPercent)
+                }
+
+                if let elapsedPercent {
+                    SegmentedProgressView(
+                        percent: elapsedPercent,
+                        segmentCount: window.isWeekly ? 7 : 1,
+                        barHeight: 4,
+                        tint: .teal,
+                        progressLabel: "额度周期时间已过"
+                    )
+                }
+            }
+
+            HStack {
+                if let elapsedPercent {
+                    Text("时间已过 \(elapsedPercent.formatted(.number.precision(.fractionLength(2))))%")
+                        .monospacedDigit()
+                } else {
+                    Text("时间进度不可用")
+                }
+                Spacer()
+                if window.isWeekly {
                     Text("每段 ≈ 1 天预算")
                 }
-                .font(.caption2)
-                .foregroundStyle(.secondary)
-            } else {
-                ContinuousProgressView(percent: window.clampedUsedPercent)
             }
+            .font(.caption2)
+            .foregroundStyle(.secondary)
 
             if let resetDate = resetDate {
                 Text("\(resetDate.formatted(.relative(presentation: .named)))重置 · \(resetDate.formatted(date: .abbreviated, time: .shortened))")
@@ -205,10 +233,4 @@ struct WindowView: View {
         window.resetsAt.map { Date(timeIntervalSince1970: TimeInterval($0)) }
     }
 
-    private var paceDescription: String {
-        guard let delta = window.paceDelta() else { return "日均预算 14.3%" }
-        let magnitude = Int(abs(delta).rounded())
-        if magnitude <= 2 { return "与本周时间进度基本同步" }
-        return delta > 0 ? "使用偏快 \(magnitude) 个百分点" : "使用偏慢 \(magnitude) 个百分点"
-    }
 }
